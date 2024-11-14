@@ -1,0 +1,72 @@
+# General OS generated files #
+##############################
+
+# macOS #
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS Resource Forks
+._*
+
+# Thumbnails
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.Spotlight-V100
+.fseventsd
+
+# Windows #
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Windows image file caches
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Windows shortcut files
+*.lnk
+
+# Linux #
+.cache/
+Thumbs.db
+
+# KDE directory
+.directory
+
+# Temporary files #
+###################
+
+# General temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*.save
+
+# Temporary files created by editors
+*~
+# Vim swap files
+.sw[a-p]
+# Vim backup files
+*.un~
+# Emacs backup files
+*~
+
+# Log files
+*.log
+
+# MacOS Finder files
+*.DS_Store
+*.AppleDouble
+*.LSOverride
+
+.env
