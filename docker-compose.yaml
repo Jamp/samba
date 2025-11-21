@@ -1,0 +1,19 @@
+services:
+  samba:
+    image: jamp/samaba
+    container_name: samba
+    build: .
+    environment:
+      - TZ=America/Lima
+      - WORKGROUP=MARVAL
+      - USERS="$USER2_NAME:$USER2_PASSWD,$CAMS_USER:$CAMS_PASSWD"
+      - ENABLE_PUBLIC=true
+      - ENABLE_TIMEMACHINE=true
+    ports:
+      - 139:139
+      - 445:445
+    volumes:
+      - ${PERSONAL_HOME_USER2}:/${USER2_NAME}
+      - ${PERSONAL_HOME_CAMS}:/${CAMS_USER}
+      - ${SHARE}:/public
+      - ${TIMEMACHINE_PATH}:/timemachine
