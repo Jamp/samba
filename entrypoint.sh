@@ -1,6 +1,13 @@
 #!/bin/sh
 addgroup smb
 
+# Start D-Bus (required by Avahi)
+mkdir -p /var/run/dbus
+dbus-daemon --system --fork
+
+# Start Avahi daemon
+avahi-daemon --daemonize --no-chroot
+
 workgroup="${WORKGROUP:-'WORKGROUP'}"
 
 # Crea el archivo de configuración de Samba
