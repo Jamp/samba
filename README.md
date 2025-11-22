@@ -9,6 +9,7 @@ Linux, allowing you to share files with custom users and optional public access.
 - **Custom User Management**: Create users with personalized directories and access credentials.
 - **Public Share Option**: Enable a public folder for anonymous access.
 - **Time Machine Support**: Native Apple Time Machine backup support with automatic configuration.
+- **Avahi mDNS/DNS-SD**: Automatic service discovery for seamless macOS integration.
 - **Configurable Timezone**: Set the timezone via the `TZ` environment variable, defaulting to `UTC` if not provided.
 - **Custom Workgroup**: Define the workgroup for network browsing compatibility.
 - **Secure File Sharing**: Uses SMB2 and SMB3 protocols for enhanced security.
@@ -23,7 +24,7 @@ docker run -d \
   -e ENABLE_TIMEMACHINE="true" \
   -e WORKGROUP="TEST" \
   -e TZ="America/New_York" \  # Optional: Specify the timezone
-  -p 445:445 -p 139:139 -p 137:137/udp -p 138:138/udp \
+  -p 445:445 -p 139:139 -p 137:137/udp -p 138:138/udp -p 5353:5353/udp \
   -v /path/to/timemachine:/timemachine \  # Required if ENABLE_TIMEMACHINE=true
   --name samba jamp/samba
 ```
