@@ -39,6 +39,35 @@ If the TZ variable is not set, UTC will be used as the default timezone.
 - Users specified in USERS will have their personal directories and authenticated access.
 - The public folder is enabled only if ENABLE_PUBLIC is set to true.
 
+## CI/CD - Automated Docker Hub Publishing
+
+This repository includes a GitHub Actions workflow that automatically builds and publishes the Docker image to Docker Hub.
+
+### Workflow Triggers
+
+The workflow runs automatically on:
+- **Push to main branch**: Builds and pushes with `latest` tag
+- **Tag creation** (e.g., `v1.0.0`): Builds and pushes with version tags
+- **Manual trigger**: Can be triggered manually from GitHub Actions tab
+
+### Required GitHub Secrets
+
+To enable automatic publishing, configure these secrets in your GitHub repository:
+
+1. Go to **Settings** → **Secrets and variables** → **Actions**
+2. Add the following secrets:
+
+| Secret Name | Description |
+|------------|-------------|
+| `DOCKERHUB_USERNAME` | Your Docker Hub username |
+| `DOCKERHUB_TOKEN` | Docker Hub access token (create at https://hub.docker.com/settings/security) |
+
+### Multi-Architecture Support
+
+The workflow builds images for:
+- `linux/amd64` (Intel/AMD processors)
+- `linux/arm64` (ARM processors, including Apple Silicon)
+
 ## Contributions and License
 
 Contributions and improvements are welcome. [Github Repo](https://github.com/Jamp/samba)
