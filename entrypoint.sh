@@ -32,20 +32,18 @@ cat <<EOF > /etc/samba/smb.conf
     server max protocol = SMB3
     server min protocol = SMB2_10
 
-    # Time Machine
-    fruit:delete_empty_adfiles = yes
-    fruit:time machine = yes
-    fruit:veto_appledouble = no
-    fruit:wipe_intentionally_left_blank_rfork = yes
-
 EOF
 
 # Agregar usuarios y directorios personalizados si se especifican
 USERS=$(echo "$USERS" | tr ',' '\n')
+VALID_USERS=""
 for user in $USERS; do
     username=$(echo $user | cut -d':' -f1)
     password=$(echo $user | cut -d':' -f2)
     home_dir="/${username}"
+
+    # Construir lista de usuarios válidos
+    VALID_USERS="$VALID_USERS $username"
 
     # Crea un directorio de usuario
     mkdir -p $home_dir
@@ -86,6 +84,29 @@ if [ "$ENABLE_PUBLIC" = "true" ]; then
     directory mask = 0777
     veto files = /.apdisk/.DS_Store/.TemporaryItems/.Trashes/desktop.ini/ehthumbs.db/Network Trash Folder/Temporary Items/Thumbs.db/
     delete veto files = yes
+
+EOF
+fi
+
+if [ "$ENABLE_TIMEMACHINE" = "true" ]; then
+    mkdir -p /timemachine
+    chmod -R 770 /timemachine
+
+    cat <<EOF >> /etc/samba/smb.conf
+[TimeMachine]
+    path = /timemachine
+    browsable = no
+    writable = yes
+    guest ok = no
+    create mask = 0600
+    directory mask = 0700
+    vfs objects = catia fruit streams_xattr
+    fruit:time machine = yes
+    fruit:veto_appledouble = no
+    fruit:advertise_fullsync = yes
+    fruit:delete_empty_adfiles = yes
+    fruit:wipe_intentionally_left_blank_rfork = yes
+    valid users = $VALID_USERS
 
 EOF
 fi
