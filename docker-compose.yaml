@@ -13,6 +13,7 @@ services:
     ports:
       - 139:139
       - 445:445
+      - 5353:5353/udp  # Avahi mDNS for macOS discovery
     volumes:
       - ${PERSONAL_HOME_USER1}:/${USER1_NAME}
       - ${PERSONAL_HOME_USER2}:/${USER2_NAME}
