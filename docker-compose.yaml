@@ -1,0 +1,20 @@
+services:
+  samba:
+    image: jamp/samba
+    container_name: samba
+    restart: unless-stopped
+    environment:
+      - NETBIOS_NAME=NAS
+      - WORKGROUP=MARVAL
+      - ENABLE_PUBLIC=true
+      - ENABLE_TIMEMACHINE=true
+      - TZ=${TZ}
+      - USERS=${USER1_NAME}:${USER1_PASSWD},${USER2_NAME}:${USER2_PASSWD}
+    ports:
+      - 139:139
+      - 445:445
+    volumes:
+      - ${PERSONAL_HOME_USER1}:/${USER1_NAME}
+      - ${PERSONAL_HOME_USER2}:/${USER2_NAME}
+      - ${TIME_MACHINE}:/timemachine
+      - ${SHARE}:/public

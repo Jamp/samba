@@ -12,6 +12,7 @@ Linux, allowing you to share files with custom users and optional public access.
 - **Avahi mDNS/DNS-SD**: Automatic service discovery for seamless macOS integration.
 - **Configurable Timezone**: Set the timezone via the `TZ` environment variable, defaulting to `UTC` if not provided.
 - **Custom Workgroup**: Define the workgroup for network browsing compatibility.
+- **NetBIOS Name**: Set a friendly name that appears in macOS Finder and Windows Network.
 - **Secure File Sharing**: Uses SMB2 and SMB3 protocols for enhanced security.
 - **Automatic Logging**: Outputs logs to `stdout` for easy monitoring.
 
@@ -23,9 +24,10 @@ docker run -d \
   -e ENABLE_PUBLIC="true" \
   -e ENABLE_TIMEMACHINE="true" \
   -e WORKGROUP="TEST" \
-  -e TZ="America/New_York" \  # Optional: Specify the timezone
+  -e NETBIOS_NAME="MY-NAS" \
+  -e TZ="America/New_York" \
   -p 445:445 -p 139:139 -p 137:137/udp -p 138:138/udp -p 5353:5353/udp \
-  -v /path/to/timemachine:/timemachine \  # Required if ENABLE_TIMEMACHINE=true
+  -v /path/to/timemachine:/timemachine \
   --name samba jamp/samba
 ```
 
@@ -35,6 +37,7 @@ docker run -d \
 - **ENABLE_PUBLIC**: Enables a public folder for guest access. Possible values: `true` or `false` (default: `false`).
 - **ENABLE_TIMEMACHINE**: Enables Apple Time Machine support. Possible values: `true` or `false` (default: `false`). When enabled, all users will have access to the Time Machine share.
 - **WORKGROUP**: Defines the Samba workgroup (default: `WORKGROUP`).
+- **NETBIOS_NAME**: Sets the friendly server name displayed in macOS Finder and Windows Network browser. If not set, defaults to the `WORKGROUP` value.
 - **TZ**: Specifies the container's timezone. If not set, the default is `UTC`.
 
 ## Notes

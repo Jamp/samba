@@ -6,9 +6,12 @@ mkdir -p /var/run/dbus
 rm -f /var/run/dbus/pid
 dbus-daemon --system --fork
 
+# Get netbios/hostname for Avahi (use NETBIOS_NAME, fallback to WORKGROUP, then default)
+avahi_hostname="${NETBIOS_NAME:-${WORKGROUP:-samba-server}}"
+
 # Configure Avahi
 sed -i 's/#enable-dbus=yes/enable-dbus=yes/g' /etc/avahi/avahi-daemon.conf
-sed -i 's/#host-name=.*/host-name='${HOSTNAME:-samba-server}'/g' /etc/avahi/avahi-daemon.conf
+sed -i 's/#host-name=.*/host-name='${avahi_hostname}'/g' /etc/avahi/avahi-daemon.conf
 
 # Start Avahi daemon
 avahi-daemon --daemonize --no-chroot
@@ -17,10 +20,12 @@ avahi-daemon --daemonize --no-chroot
 sleep 2
 
 workgroup="${WORKGROUP:-'WORKGROUP'}"
+netbios_name="${NETBIOS_NAME:-$workgroup}"
 
 # Crea el archivo de configuración de Samba
 cat <<EOF > /etc/samba/smb.conf
 [global]
+    netbios name = $netbios_name
     server string = Samba Server of $workgroup
     workgroup = $workgroup
     server role = standalone server
