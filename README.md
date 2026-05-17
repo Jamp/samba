@@ -27,7 +27,9 @@ docker run -d \
   -e NETBIOS_NAME="MY-NAS" \
   -e TZ="America/New_York" \
   -p 445:445 -p 139:139 -p 137:137/udp -p 138:138/udp -p 5353:5353/udp \
-  -v /path/to/timemachine:/timemachine \
+  -v /srv/disk0/home:/homes \
+  -v /srv/disk0/public:/public \
+  -v /srv/disk0/timemachine:/timemachine \
   --name samba jamp/samba
 ```
 
@@ -39,6 +41,74 @@ docker run -d \
 - **WORKGROUP**: Defines the Samba workgroup (default: `WORKGROUP`).
 - **NETBIOS_NAME**: Sets the friendly server name displayed in macOS Finder and Windows Network browser. If not set, defaults to the `WORKGROUP` value.
 - **TZ**: Specifies the container's timezone. If not set, the default is `UTC`.
+
+## Volumes & Data Persistence
+
+To persist data across container restarts you **must** mount host directories into the container. Without volumes, data lives on the container's writable layer and is lost when the container is recreated.
+
+| Container path | Purpose | Required when |
+|----------------|---------|---------------|
+| `/homes`       | Base directory containing one subdirectory per user from `USERS` (e.g. `/homes/jamp`, `/homes/maria`) | Always recommended |
+| `/public`      | Public share (guest access)                                              | `ENABLE_PUBLIC=true` |
+| `/timemachine` | Apple Time Machine backup target                                         | `ENABLE_TIMEMACHINE=true` |
+
+### How user homes work
+
+All user home directories live under a single base path inside the container: `/homes/<username>`. You only need to mount **one** host directory to `/homes` and every user defined in `USERS` will get an automatically created subdirectory there.
+
+For example, with `USERS=jamp:secret,maria:secret` and `/srv/disk0/home:/homes` mounted:
+
+```
+Host                          Container
+/srv/disk0/home/         <->  /homes/
+├── jamp/                <->  ├── jamp/      (Samba share [jamp])
+└── maria/               <->  └── maria/     (Samba share [maria])
+```
+
+The container creates each subdirectory, the Linux user, and sets ownership (`username:username`) and permissions (`770`) on first start, so the host directory can be empty.
+
+> **Tip:** Create the parent directory on the host before starting the container (e.g. `sudo mkdir -p /srv/disk0/home`). Docker creates the per-user subdirectories automatically when the volume is mounted.
+
+### docker-compose example
+
+```yaml
+services:
+  samba:
+    image: jamp/samba
+    container_name: samba
+    restart: unless-stopped
+    environment:
+      - NETBIOS_NAME=NAS
+      - WORKGROUP=WORKGROUP
+      - ENABLE_PUBLIC=true
+      - ENABLE_TIMEMACHINE=true
+      - TZ=America/New_York
+      - USERS=jamp:secret1,maria:secret2
+    ports:
+      - 139:139
+      - 445:445
+      - 5353:5353/udp
+    volumes:
+      - /srv/disk0/home:/homes
+      - /srv/disk0/public:/public
+      - /srv/disk0/timemachine:/timemachine
+```
+
+Or with an `.env` file for portability:
+
+```bash
+# .env
+HOMES_DIR=/srv/disk0/home
+SHARE=/srv/disk0/public
+TIME_MACHINE=/srv/disk0/timemachine
+```
+
+```yaml
+volumes:
+  - ${HOMES_DIR}:/homes
+  - ${SHARE}:/public
+  - ${TIME_MACHINE}:/timemachine
+```
 
 ## Notes
 

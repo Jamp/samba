@@ -73,7 +73,7 @@ VALID_USERS=""
 for user in $USERS; do
     username=$(echo $user | cut -d':' -f1)
     password=$(echo $user | cut -d':' -f2)
-    home_dir="/${username}"
+    home_dir="/homes/${username}"
 
     # Construir lista de usuarios válidos
     VALID_USERS="$VALID_USERS $username"
