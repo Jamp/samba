@@ -9,7 +9,7 @@ services:
       - ENABLE_PUBLIC=true
       - ENABLE_TIMEMACHINE=true
       - TZ=${TZ}
-      - USERS=${USER1_NAME}:${USER1_PASSWD},${USER2_NAME}:${USER2_PASSWD}
+      - USERS=${SAMBA_USERS}
     ports:
       - 139:139
       - 445:445
@@ -18,3 +18,19 @@ services:
       - ${HOMES_DIR}:/homes
       - ${TIME_MACHINE}:/timemachine
       - ${SHARE}:/public
+    # ─── Hardening ─────────────────────────────────────────
+    # Drop all capabilities and only add the ones Samba needs.
+    # See README for details.
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE   # bind ports 139/445
+      - SETUID             # smbd switches to the authenticated user
+      - SETGID             # idem
+      - CHOWN              # create homes with correct owner
+      - DAC_OVERRIDE       # access paths owned by different uids
+      - FOWNER             # chmod/chown files
+      - SYS_CHROOT         # smbd chroots per connection
+      - NET_RAW            # required by avahi-daemon
+    security_opt:
+      - no-new-privileges:true

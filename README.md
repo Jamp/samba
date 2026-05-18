@@ -30,8 +30,29 @@ docker run -d \
   -v /srv/disk0/home:/homes \
   -v /srv/disk0/public:/public \
   -v /srv/disk0/timemachine:/timemachine \
+  --cap-drop=ALL \
+  --cap-add=NET_BIND_SERVICE --cap-add=SETUID --cap-add=SETGID \
+  --cap-add=CHOWN --cap-add=DAC_OVERRIDE --cap-add=FOWNER \
+  --cap-add=SYS_CHROOT --cap-add=NET_RAW \
+  --security-opt no-new-privileges:true \
   --name samba jamp/samba
 ```
+
+## Security hardening
+
+This image runs Samba with a minimal set of Linux capabilities (everything dropped except those Samba actually needs) and the `no-new-privileges` flag. This shrinks the attack surface significantly compared to a default Docker container running as root with the full capability set.
+
+| Capability | Why Samba needs it |
+|------------|-------------------|
+| `NET_BIND_SERVICE` | Bind to privileged ports 139/445 |
+| `SETUID` / `SETGID` | `smbd` forks and switches to the authenticated user per connection |
+| `CHOWN` | Create user home directories with the correct owner |
+| `DAC_OVERRIDE` | Access files owned by different uids when serving shares |
+| `FOWNER` | `chmod`/`chown` operations on shared files |
+| `SYS_CHROOT` | `smbd` chroots into each share per connection |
+| `NET_RAW` | Required by `avahi-daemon` for mDNS broadcast |
+
+> **Note:** A truly *non-root* Samba is impractical because `smbd` must `setuid()` to the authenticated user on every connection. Dropping all but the required capabilities is the realistic hardening for this workload. See the `docker-compose.yaml` for the recommended setup.
 
 ## Configuration
 

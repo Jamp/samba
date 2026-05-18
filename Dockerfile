@@ -1,12 +1,15 @@
-FROM alpine:3.21
+FROM alpine:3.22
 
-RUN apk update && apk add --no-cache \
-    samba \
-    samba-common-tools \
-    avahi \
-    avahi-tools \
-    avahi-compat-libdns_sd \
-    dbus
+RUN apk update \
+    && apk upgrade --no-cache \
+    && apk add --no-cache \
+        samba \
+        samba-common-tools \
+        avahi \
+        avahi-tools \
+        avahi-compat-libdns_sd \
+        dbus \
+    && rm -rf /var/cache/apk/*
 
 COPY entrypoint.sh /entrypoint.sh
 COPY avahi-services/*.service /etc/avahi/services/
